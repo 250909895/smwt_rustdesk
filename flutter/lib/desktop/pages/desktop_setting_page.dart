@@ -1182,8 +1182,9 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
             if (usePassword)
               _SubButton('Set permanent password', setPasswordDialog,
                   permEnabled && !locked),
-            // if (usePassword)
-            //   hide_cm(!locked).marginOnly(left: _kContentHSubMargin - 6),
+            //使用固定密码时候才显示隐藏CM勾选框      
+            if (usePassword)
+               hide_cm(!locked).marginOnly(left: _kContentHSubMargin - 6),
             if (usePassword) radios[2],
           ]);
         })));
@@ -1350,7 +1351,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
 
     return tmpWrapper();
   }
-
+  //页面显示隐藏连接管理窗口选项
   Widget hide_cm(bool enabled) {
     return ChangeNotifierProvider.value(
         value: gFFI.serverModel,
@@ -1359,7 +1360,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
               model.verificationMethod == kUsePermanentPassword;
           onHideCmChanged(bool? b) {
             if (b != null) {
-              bind.mainSetOption(
+              bind.mainGetLocalOption(
                   key: 'allow-hide-cm', value: bool2option('allow-hide-cm', b));
             }
           }
