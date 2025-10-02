@@ -100,7 +100,7 @@ class ServerModel with ChangeNotifier {
     //验证方式不是固定密码时，禁止隐藏主窗口
     await bind.mainSetOption(key: kOptionVerificationMethod, value: method);
     if (method != kUsePermanentPassword) {
-      await bind.setLocalFlutterOption(k: kOptionAllowHideCm, value: bool2option('allow-hide-cm', false));
+      await bind.setLocalFlutterOption(k: kOptionAllowHideCm, v: bool2option('allow-hide-cm', false));
     }
   }
 
@@ -120,7 +120,7 @@ class ServerModel with ChangeNotifier {
     await bind.mainSetOption(key: kOptionApproveMode, value: mode);
     //验证类型不是密码时，禁止隐藏主窗口
     if (mode != 'password') {
-      await bind.setLocalFlutterOption(k: kOptionAllowHideCm, value: bool2option('allow-hide-cm', false));
+      await bind.setLocalFlutterOption(k: kOptionAllowHideCm, v: bool2option('allow-hide-cm', false));
     }
   }
 
