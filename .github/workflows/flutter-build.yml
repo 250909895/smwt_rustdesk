@@ -103,12 +103,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV    
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV  
 
       - name: Restore bridge files
         uses: actions/download-artifact@master
@@ -335,12 +337,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV      
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV       
 
       - name: Install LLVM and Clang
         uses: rustdesk-org/install-llvm-action-32bit@master
@@ -489,12 +493,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV            
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV             
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -625,12 +631,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV            
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV             
 
       - name: Import the codesign cert
         if: env.MACOS_P12_BASE64 != null
@@ -931,12 +939,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV            
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV             
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -1212,12 +1222,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV            
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV             
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -1386,12 +1398,14 @@ jobs:
       - name: Set Repository secrets for hbb_common
         shell: bash
         run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV            
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV             
 
       - name: Set Swap Space
         if: ${{ matrix.job.arch == 'x86_64' }}
