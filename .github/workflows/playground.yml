@@ -91,6 +91,18 @@ jobs:
           ref: ${{ matrix.job.ref }}
           submodules: recursive
 
+      - name: Set Repository secrets for hbb_common
+        shell: bash
+        run: |
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV                 
+
       - name: Import the codesign cert
         if: env.MACOS_P12_BASE64 != null
         uses: apple-actions/import-codesign-certs@v1
@@ -251,6 +263,18 @@ jobs:
         with:
           ref: ${{ matrix.job.ref }}
           submodules: recursive
+
+      - name: Set Repository secrets for hbb_common
+        shell: bash
+        run: |
+          {
+            echo "APP_NAME=${{ secrets.APP_NAME }}"
+            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
+            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
+            echo "API_SERVER=${{ secrets.API_SERVER }}"
+            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
+            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
+          } >> $GITHUB_ENV                 
 
       - name: Install dependencies
         run: |
