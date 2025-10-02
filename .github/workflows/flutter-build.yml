@@ -98,19 +98,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV  
 
       - name: Restore bridge files
         uses: actions/download-artifact@master
@@ -332,20 +319,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV       
-
+     
       - name: Install LLVM and Clang
         uses: rustdesk-org/install-llvm-action-32bit@master
         with:
@@ -487,20 +461,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV             
+          submodules: recursive          
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -625,20 +586,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV             
+          submodules: recursive          
 
       - name: Import the codesign cert
         if: env.MACOS_P12_BASE64 != null
@@ -933,20 +881,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV             
+          submodules: recursive          
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -1216,20 +1151,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV             
+          submodules: recursive           
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -1392,20 +1314,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          {
-            echo "APP_NAME=${{ secrets.APP_NAME }}"
-            echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-            echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-            echo "API_SERVER=${{ secrets.API_SERVER }}"
-            echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-            echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-          } >> $GITHUB_ENV             
+          submodules: recursive          
 
       - name: Set Swap Space
         if: ${{ matrix.job.arch == 'x86_64' }}
@@ -1736,17 +1645,6 @@ jobs:
         with:
           submodules: recursive
 
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV
-
       - name: Modify vcpkg.json for armv7
         if: matrix.job.vcpkg-triplet == 'arm-linux'
         run: |
@@ -1948,17 +1846,6 @@ jobs:
         with:
           submodules: recursive
 
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV
-
       - name: Download Binary
         uses: actions/download-artifact@master
         with:
@@ -2032,17 +1919,6 @@ jobs:
         with:
           submodules: recursive
 
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV
-
       - name: Download Binary
         uses: actions/download-artifact@master
         with:
@@ -2103,17 +1979,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      #为hbb_common添加自定义环境变量
-      - name: Set Repository secrets for hbb_common
-        shell: bash
-        run: |
-          echo "APP_NAME=${{ secrets.APP_NAME }}" >> $GITHUB_ENV
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}" >> $GITHUB_ENV
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}" >> $GITHUB_ENV
-          echo "API_SERVER=${{ secrets.API_SERVER }}" >> $GITHUB_ENV
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}" >> $GITHUB_ENV
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Prepare env
         run: |
