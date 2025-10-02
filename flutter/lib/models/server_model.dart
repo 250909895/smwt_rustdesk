@@ -101,7 +101,7 @@ class ServerModel with ChangeNotifier {
     await bind.mainSetOption(key: kOptionVerificationMethod, value: method);
     if (method != kUsePermanentPassword) {
       await bind.setLocalFlutterOption(
-          key: 'allow-hide-cm', value: bool2option('allow-hide-cm', false));
+          key: kOptionAllowHideCm, value: bool2option('allow-hide-cm', false));
     }
   }
 
@@ -122,7 +122,7 @@ class ServerModel with ChangeNotifier {
     //验证类型不是密码时，禁止隐藏主窗口
     if (mode != 'password') {
       await bind.setLocalFlutterOption(
-          key: 'allow-hide-cm', value: bool2option('allow-hide-cm', false));
+          key: kOptionAllowHideCm, value: bool2option('allow-hide-cm', false));
     }
   }
 
@@ -152,7 +152,7 @@ class ServerModel with ChangeNotifier {
         bind.mainGetOptionSync(key: kOptionVerificationMethod);
     final approveMode = bind.mainGetOptionSync(key: kOptionApproveMode);
     _hideCm = option2bool(
-        'allow-hide-cm', bind.getLocalFlutterOption(key: 'allow-hide-cm'));
+        'allow-hide-cm', bind.getLocalFlutterOption(key: kOptionAllowHideCm));
     if (!(approveMode == 'password' &&
         verificationMethod == kUsePermanentPassword)) {
       _hideCm = false;
@@ -252,7 +252,7 @@ class ServerModel with ChangeNotifier {
     //根据hide_cm配置，决定是否隐藏主窗口
     //仅在验证方式为永久密码且审批方式为密码时，允许隐藏
     var hideCm = option2bool(
-        'allow-hide-cm', await bind.getLocalFlutterOption(key: 'allow-hide-cm'));
+        'allow-hide-cm', await bind.getLocalFlutterOption(key: kOptionAllowHideCm));
     if (!(approveMode == 'password' &&
         verificationMethod == kUsePermanentPassword)) {
       hideCm = false;
