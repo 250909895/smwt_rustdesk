@@ -8,7 +8,7 @@ on:
         default: true
       upload-tag:
         type: string
-        default: "nightly"
+        default: "nightly"    
 
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
 # variables from this workflow!
@@ -48,7 +48,7 @@ env:
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
   #添加自定义环境变量
   APP_NAME: "${{ secrets.APP_NAME }}"
-  RUSTDESK_RENDEZVOUS: "${{ secrets.RUSTDESK_RENDEZVOUS }}"
+  RENDEZVOUS_SERVER: "${{ secrets.RENDEZVOUS_SERVER }}"
   RELAY_SERVER: "${{ secrets.RELAY_SERVER }}"
   API_SERVER: "${{ secrets.API_SERVER }}"
   RS_PUB_KEY: "${{ secrets.RS_PUB_KEY }}"
