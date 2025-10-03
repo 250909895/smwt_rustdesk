@@ -1356,27 +1356,25 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
     return ChangeNotifierProvider.value(
         value: gFFI.serverModel,
         child: Consumer<ServerModel>(builder: (context, model, child) {
-          final enableHideCm = model.approveMode == 'password' &&
-              model.verificationMethod == kUsePermanentPassword;
           onHideCmChanged(bool? b) {
             if (b != null) {
               //先传入验证是否合规
               model.hideCm = b;
               //再保存到本地
-              mainSetLocalBoolOption(kOptionAllowHideCm,model.hideCm);
+              await mainSetLocalBoolOption(kOptionAllowHideCm, model.hideCm);
             }
           }
 
           return Tooltip(
-              message: enableHideCm ? "" : translate('hide_cm_tip'),
+              message: model.hideCm ? "" : translate('hide_cm_tip'),
               child: GestureDetector(
                 onTap:
-                    enableHideCm ? () => onHideCmChanged(!model.hideCm) : null,
+                    model.hideCm ? () => onHideCmChanged(!model.hideCm) : null,
                 child: Row(
                   children: [
                     Checkbox(
                             value: model.hideCm,
-                            onChanged: enabled && enableHideCm
+                            onChanged: enabled && model.hideCm
                                 ? onHideCmChanged
                                 : null)
                         .marginOnly(right: 5),
@@ -1385,7 +1383,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
                         translate('Hide connection management window'),
                         style: TextStyle(
                             color: disabledTextColor(
-                                context, enabled && enableHideCm)),
+                                context, enabled && model.hideCm)),
                       ),
                     ),
                   ],

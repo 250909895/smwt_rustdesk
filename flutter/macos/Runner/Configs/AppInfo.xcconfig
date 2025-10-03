@@ -5,7 +5,8 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = RustDesk
+//引用环境变量
+PRODUCT_NAME = $(APP_NAME:default=RustDesk)
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.carriez.flutterHbb

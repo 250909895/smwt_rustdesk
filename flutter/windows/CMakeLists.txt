@@ -4,7 +4,15 @@ project(rustdesk LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "rustdesk")
+# 尝试从环境变量获取APP_NAME
+if(DEFINED ENV{APP_NAME})
+    set(BINARY_NAME $ENV{APP_NAME})
+    message(STATUS "Using APP_NAME from environment: ${BINARY_NAME}")
+else()
+    # 如果没有环境变量，使用默认值
+    set(BINARY_NAME "rustdesk")
+    message(STATUS "Using default APP_NAME: ${BINARY_NAME}")
+endif()
 
 # Explicitly opt into modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
