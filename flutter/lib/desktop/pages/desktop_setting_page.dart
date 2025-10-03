@@ -1361,7 +1361,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
               //先传入验证是否合规
               model.hideCm = b;
               //再保存到本地
-              mainSetLocalBoolOption(kOptionAllowHideCm, model.hideCm);
+              bind.mainSetLocalOption(key: "allow-hide-cm", value: model.hideCm ? "Y" : "N");
             }
           }
 

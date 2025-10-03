@@ -64,7 +64,7 @@ class ServerModel with ChangeNotifier {
   bool get clipboardOk => _clipboardOk;
 
   bool get showElevation => _showElevation;
-
+  //CM窗口是否显示状态值
   bool get hideCm => _hideCm;
   set hideCm(bool value) {
     if (_hideCm != value) {
