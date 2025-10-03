@@ -1358,23 +1358,23 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
         child: Consumer<ServerModel>(builder: (context, model, child) {
           onHideCmChanged(bool? b) {
             if (b != null) {
-              //先传入验证是否合规
-              model.hideCm = b;
+              final enableHideCm = model.approveMode == 'password' &&
+              model.verificationMethod == kUsePermanentPassword;
               //再保存到本地
-              bind.mainSetLocalOption(key: "allow-hide-cm", value: model.hideCm ? "Y" : "N");
+              bind.mainSetLocalOption(key: "allow-hide-cm", value: b ? "Y" : "N");
             }
           }
 
           return Tooltip(
-              message: model.hideCm ? "" : translate('hide_cm_tip'),
+              message: enableHideCm ? "" : translate('hide_cm_tip'),
               child: GestureDetector(
                 onTap:
-                    model.hideCm ? () => onHideCmChanged(!model.hideCm) : null,
+                    enableHideCm ? () => onHideCmChanged(!model.hideCm) : null,
                 child: Row(
                   children: [
                     Checkbox(
                             value: model.hideCm,
-                            onChanged: enabled && model.hideCm
+                            onChanged: enabled && enableHideCm
                                 ? onHideCmChanged
                                 : null)
                         .marginOnly(right: 5),

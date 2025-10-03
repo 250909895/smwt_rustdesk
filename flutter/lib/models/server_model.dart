@@ -67,10 +67,12 @@ class ServerModel with ChangeNotifier {
   //CM窗口是否显示状态值
   bool get hideCm => _hideCm;
   set hideCm(bool value) {
+    if (value.isEmpty || value == null) {
+      value = false;
+    };  
     if (_hideCm != value) {
       _hideCm = value;
-      if (!(approveMode == 'password' &&
-          verificationMethod == kUsePermanentPassword)) {
+      if (!(approveMode == 'password' && verificationMethod == kUsePermanentPassword)) {
         _hideCm = false;
       }
       notifyListeners();
