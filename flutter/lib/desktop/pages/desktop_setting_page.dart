@@ -1351,17 +1351,18 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
 
     return tmpWrapper();
   }
+
   //页面显示隐藏连接管理窗口选项
   Widget hide_cm(bool enabled) {
     return ChangeNotifierProvider.value(
         value: gFFI.serverModel,
         child: Consumer<ServerModel>(builder: (context, model, child) {
+          final enableHideCm = model.approveMode == 'password' &&
+              model.verificationMethod == kUsePermanentPassword;
           onHideCmChanged(bool? b) {
             if (b != null) {
-              final enableHideCm = model.approveMode == 'password' &&
-              model.verificationMethod == kUsePermanentPassword;
-              //再保存到本地
-              bind.mainSetLocalOption(key: "allow-hide-cm", value: b ? "Y" : "N");
+              bind.mainSetLocalOption(
+                  key: 'allow-hide-cm', value: bool2option('allow-hide-cm', b));
             }
           }
 
@@ -1383,7 +1384,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
                         translate('Hide connection management window'),
                         style: TextStyle(
                             color: disabledTextColor(
-                                context, enabled && model.hideCm)),
+                                context, enabled && enableHideCm)),
                       ),
                     ),
                   ],

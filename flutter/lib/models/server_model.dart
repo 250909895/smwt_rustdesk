@@ -67,7 +67,7 @@ class ServerModel with ChangeNotifier {
   //CM窗口是否显示状态值
   bool get hideCm => _hideCm;
   set hideCm(bool value) {
-    if (value.isEmpty || value == null) {
+    if (value == "" || value == null) {
       value = false;
     };  
     if (_hideCm != value) {
