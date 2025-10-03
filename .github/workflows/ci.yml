@@ -94,19 +94,7 @@ jobs:
     - name: Checkout source code
       uses: actions/checkout@v4
       with:
-        submodules: recursive
-
-    - name: Set Repository secrets for hbb_common
-      shell: bash
-      run: |
-        {
-          echo "APP_NAME=${{ secrets.APP_NAME }}"
-          echo "RENDEZVOUS_SERVER=${{ secrets.RENDEZVOUS_SERVER }}"
-          echo "RELAY_SERVER=${{ secrets.RELAY_SERVER }}"
-          echo "API_SERVER=${{ secrets.API_SERVER }}"
-          echo "RS_PUB_KEY=${{ secrets.RS_PUB_KEY }}"
-          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}"
-        } >> $GITHUB_ENV       
+        submodules: recursive       
 
     - name: Install prerequisites
       shell: bash

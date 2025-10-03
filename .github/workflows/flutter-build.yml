@@ -47,7 +47,6 @@ env:
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
   #添加自定义环境变量
-  APP_NAME: "${{ secrets.APP_NAME }}"
   RENDEZVOUS_SERVER: "${{ secrets.RENDEZVOUS_SERVER }}"
   RELAY_SERVER: "${{ secrets.RELAY_SERVER }}"
   API_SERVER: "${{ secrets.API_SERVER }}"
