@@ -1360,7 +1360,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
               model.verificationMethod == kUsePermanentPassword;
           onHideCmChanged(bool? b) {
             if (b != null) {
-              bind.mainSetLocalBoolOption(key: kOptionAllowHideCm,b);
+             await mainSetLocalBoolOption(kOptionAllowHideCm,b);
             }
           }
 
