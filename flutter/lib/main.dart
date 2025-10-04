@@ -296,8 +296,8 @@ void runConnectionManagerScreen() async {
   //获取hide_cm配置
   final hide = await bind.cmGetConfig(name: "hide_cm") == 'true';
   //final allowhidecm = mainGetLocalBoolOptionSync(kOptionAllowHideCm);
-  final allowhidecm = bind.mainGetLocalOption(key: 'allow-hide-cm') == 'Y';
-  gFFI.serverModel.hideCm = hide || allowhidecm;
+  //final allowhidecm = bind.mainGetLocalOption(key: 'allow-hide-cm') == 'Y';
+  gFFI.serverModel.hideCm = hide 
   //根据hide_cm配置，决定是否隐藏主窗口 
   if (hide) {
     await hideCmWindow(isStartup: true);
