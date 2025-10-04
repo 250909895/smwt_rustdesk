@@ -176,7 +176,7 @@ class ServerModel with ChangeNotifier {
           } else {
             _zeroClientLengthCounter = 0;
           }
-          await model.applyHideDecision();
+          await applyHideDecision();
         }
       }
 
@@ -234,12 +234,11 @@ class ServerModel with ChangeNotifier {
       // 只有在 password 审批且验证方法为永久密码时才允许隐藏（与 UI 条件一致）
       final bool canHideByMode = (approveMode == 'password' && verificationMethod == kUsePermanentPassword);
 
-      // 示例额外条件：没有客户端连接时才可以隐藏
+      // 规则：
+      // - 当没有客户端连接时（noClients == true）始终隐藏。
+      // - 当有客户端连接时，只有在 canHideByMode && effectiveAllowHide 为真时才隐藏。
       final bool noClients = _clients.isEmpty;
-      final bool shouldHide = true;
-      if(!noClients){
-        shouldHide = canHideByMode && effectiveAllowHide;
-      }
+      final bool shouldHide = noClients ? true : (canHideByMode && effectiveAllowHide);
       if (shouldHide != _isCurrentlyHidden) {
         _isCurrentlyHidden = shouldHide;
         if (shouldHide) {
@@ -586,7 +585,7 @@ class ServerModel with ChangeNotifier {
       }
     }
     if (desktopType == DesktopType.cm) {
-      await model.applyHideDecision();
+      await applyHideDecision();
     }
     if (_clients.length != oldClientLenght) {
       notifyListeners();
@@ -756,7 +755,7 @@ class ServerModel with ChangeNotifier {
     }
   }
 
-  void onClientRemove(Map<String, dynamic> evt) {
+  Future<void> onClientRemove(Map<String, dynamic> evt) async {
     try {
       final id = int.parse(evt['id'] as String);
       final close = (evt['close'] as String) == 'true';
@@ -774,7 +773,7 @@ class ServerModel with ChangeNotifier {
         parent.target?.invokeMethod("cancel_notification", id);
       }
       if (desktopType == DesktopType.cm) {
-        await model.applyHideDecision();
+        await applyHideDecision();
       }
       if (isAndroid) androidUpdatekeepScreenOn();
       notifyListeners();

@@ -293,6 +293,7 @@ void runConnectionManagerScreen() async {
     const DesktopServerPage(),
     MyTheme.currentThemeMode(),
   );
+
   // 获取服务端配置以及本地配置
   // 若获取异常或返回空值，则设置默认值为 false
   bool serverHideBool = false;
@@ -302,7 +303,7 @@ void runConnectionManagerScreen() async {
   } catch (e) {
     serverHideBool = false;
   }
-
+  // 读取本地选项 'allow-hide-cm'：localRaw=原始值，localExplicit=是否有本地设置，localHideBool=true 表示 'Y'（允许隐藏）；读取失败视为未设置
   String? localRaw;
   bool localHideBool = false;
   bool localExplicit = false;
@@ -311,19 +312,18 @@ void runConnectionManagerScreen() async {
     localExplicit = localRaw != null && localRaw.isNotEmpty;
     localHideBool = localExplicit && (localRaw == 'Y');
   } catch (e) {
+    // 读取失败时当作未设置（即不生效），并保持默认 false
     localRaw = null;
     localHideBool = false;
     localExplicit = false;
   }
-
   // 如果本地有显式设置则采用本地值，否则采用服务端配置
   final bool effectiveHide = localExplicit ? localHideBool : serverHideBool;
-
   // 把用户偏好写入内存模型（持久化只能在设置 UI 中完成）
   gFFI.serverModel.setHideCmFromInitial(effectiveHide, explicit: localExplicit);
-
   // Startup 时需要使用 isStartup 参数做特殊处理（由模型决定并执行）
   await gFFI.serverModel.applyHideDecision(isStartup: true);
+
   setResizable(false);
   // Start the uni links handler and redirect links to Native, not for Flutter.
   listenUniLinks(handleByFlutter: false);
