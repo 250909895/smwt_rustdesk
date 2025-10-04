@@ -303,26 +303,27 @@ void runConnectionManagerScreen() async {
     serverHideBool = false;
   }
 
+  String? localRaw;
   bool localHideBool = false;
+  bool localExplicit = false;
   try {
-    final String? localRaw = await bind.mainGetLocalOption(key: "allow-hide-cm");
-    localHideBool = localRaw != null && localRaw.isNotEmpty && localRaw == 'Y';
+    localRaw = await bind.mainGetLocalOption(key: "allow-hide-cm");
+    localExplicit = localRaw != null && localRaw.isNotEmpty;
+    localHideBool = localExplicit && (localRaw == 'Y');
   } catch (e) {
+    localRaw = null;
     localHideBool = false;
+    localExplicit = false;
   }
 
-  // 本地设置优先：如果本地有显式设置则采用本地值，否则采用服务端配置
-  final bool effectiveHide = localHideBool ?? serverHideBool;
+  // 如果本地有显式设置则采用本地值，否则采用服务端配置
+  final bool effectiveHide = localExplicit ? localHideBool : serverHideBool;
 
   // 把用户偏好写入内存模型（持久化只能在设置 UI 中完成）
-  gFFI.serverModel.setHideCmFromInitial(effectiveHide);
+  gFFI.serverModel.setHideCmFromInitial(effectiveHide, explicit: localExplicit);
 
-  // Startup 时需要使用 isStartup 参数做特殊处理（窗口初始化）
-  if (effectiveHide) {
-    await hideCmWindow(isStartup: true);
-  } else {
-    await showCmWindow(isStartup: true);
-  }
+  // Startup 时需要使用 isStartup 参数做特殊处理（由模型决定并执行）
+  await gFFI.serverModel.applyHideDecision(isStartup: true);
   setResizable(false);
   // Start the uni links handler and redirect links to Native, not for Flutter.
   listenUniLinks(handleByFlutter: false);
@@ -355,6 +356,8 @@ showCmWindow({bool isStartup = false}) async {
       windowOnTop(null);
     }
   }
+  //显示窗口的同时持久化用户偏好
+  // 持久化应由设置 UI 负责；此处仅负责窗口显示行为
 }
 
 hideCmWindow({bool isStartup = false}) async {
@@ -375,6 +378,7 @@ hideCmWindow({bool isStartup = false}) async {
       await windowManager.hide();
     }
   }
+  // 持久化应由设置 UI 负责；此处仅负责窗口隐藏行为
 }
 
 void _runApp(

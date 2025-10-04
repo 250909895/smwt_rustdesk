@@ -9,6 +9,7 @@ import 'package:flutter_hbb/common.dart';
 import 'package:flutter_hbb/common/widgets/audio_input.dart';
 import 'package:flutter_hbb/common/widgets/setting_widgets.dart';
 import 'package:flutter_hbb/consts.dart';
+import 'package:flutter_hbb/main.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_home_page.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_tab_page.dart';
 import 'package:flutter_hbb/mobile/widgets/dialog.dart';
@@ -1360,14 +1361,16 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
       value: gFFI.serverModel,
       child: Consumer<ServerModel>(builder: (context, model, child) {
         onHideCmChanged(bool? b) async {
-          if (b == null) return;
-
-          // 将用户选择写入本地持久化（'Y'/'N'）
-          await bind.mainSetLocalOption(key: 'allow-hide-cm', value: b ? 'Y' : 'N');
-
-          // 更新模型的请求状态（标记为用户显式设置）并立刻重新评估是否需要隐藏/显示窗口
-          model.setHideCmFromUser(b);
-          await gFFI.serverModel.applyHideDecision();
+            if (b == null) return;
+            // 先持久化用户选择（由 UI 负责持久化）
+            try {
+              await bind.mainSetLocalOption(key: 'allow-hide-cm', value: b ? 'Y' : 'N');
+            } catch (e) {
+              // 忽略持久化错误（UI 不应阻塞），但仍更新内存模型以保持 UI 响应
+            }
+            // 更新内存模型并让模型来决定是否显示/隐藏窗口
+            model.setHideCmFromUser(b);
+            await model.applyHideDecision();
         }
 
         // 只有在外层启用并且审批模式为密码且验证方法为永久密码时才允许交互

@@ -32,16 +32,14 @@ class ServerModel with ChangeNotifier {
   bool _fileOk = false;
   bool _clipboardOk = false;
   bool _showElevation = false;
-  // 是否请求隐藏 CM 窗口（来自用户偏好或本地选项）。表示“请求/偏好”，
-  // 并不等同于窗口实际是否已被隐藏。
-  bool _isHideCmRequested = false;
-  // 本地是否由用户显式设置过（true 表示用户通过设置 UI 显式保存了值）。
-  // 仅在 main.dart 加载时读取持久化（local option）或在设置 UI 写入时设置该标志。
-  bool _isHideCmExplicit = false;
-  // 是否正在处理隐藏/显示决策（互斥标志），用于防止 applyHideDecision 被并发调用。
-  bool _isProcessingHide = false;
-  // 记录上一次实际应用到窗口的隐藏状态（最后生效的结果），用于避免重复执行相同动作。
-  bool _isCurrentlyHidden = false;
+  // 内存中保存的隐藏 CM 偏好 —— 不再直接公开可写字段，使用下面的 API
+  bool _isHideCmRequested = false; // 内存中记录希望隐藏 CM 的值（可来自 local 或用户）
+  bool _isHideCmExplicit = false; // 是否为用户显式设置（本地持久化过）
+  bool _isProcessingHide = false; // 防止 applyHideDecision 并发
+  bool _isCurrentlyHidden = false; // 记录上次实际应用到窗口的状态
+
+  // 兼容性：提供只读访问器供 UI 读取当前请求值
+  bool get hideCm => _isHideCmRequested;
   int _connectStatus = 0; // Rendezvous Server status
   String _verificationMethod = "";
   String _temporaryPasswordLength = "";
@@ -73,71 +71,6 @@ class ServerModel with ChangeNotifier {
   bool get clipboardOk => _clipboardOk;
 
   bool get showElevation => _showElevation;
-  
-  bool get hideCm => _isHideCmRequested;
-  
-  set hideCm(bool value) {
-    // 仅更新“隐藏请求”状态（来自用户/本地设置）。
-    // 真正是否隐藏由 `applyHideDecision()` 决定，避免在 setter 中重复执行策略判断。
-    if (_isHideCmRequested == value) return;
-    _isHideCmRequested = value;
-    notifyListeners();
-  }
-
-  /// 在应用启动时由 `main.dart` 调用，用来初始化内存中的偏好状态。
-  /// 参数 [explicit] 表示这个值是否源自本地持久化（true）还是仅为服务端回退值（false）。
-  void setHideCmFromInitial(bool value, {bool explicit = false}) {
-    _isHideCmRequested = value;
-    _isHideCmExplicit = explicit;
-    notifyListeners();
-  }
-
-  /// 在设置 UI 中用户显式更改时调用：既更新内存偏好，也将显式标志设为 true。
-  void setHideCmFromUser(bool value) {
-    _isHideCmRequested = value;
-    _isHideCmExplicit = true;
-    notifyListeners();
-  }
-
-  // 计算并执行 CM 窗口的隐藏/显示决策：
-  // - 考虑 approveMode、verificationMethod、本地选项和服务端配置，以及当前客户端数量
-  // - 使用互斥标志防止重入
-  // - 仅在生效状态改变时调用 hideCmWindow()/showCmWindow()
-  Future<void> applyHideDecision() async {
-    if (_isProcessingHide) return; // 防重入
-    _isProcessingHide = true;
-    try {
-      final canHideByMode = (approveMode == 'password' && verificationMethod == kUsePermanentPassword);
-
-      // 读取服务端配置（异步）。本地持久化不在此处读取——
-      // 本地持久化只在 main.dart 启动加载时读取，写入只由设置 UI 完成。
-      String serverHide = '';
-      try {
-        serverHide = await bind.cmGetConfig(name: 'hide_cm');
-      } catch (e) {
-        serverHide = '';
-      }
-      final serverHideBool = serverHide == 'true';
-
-      // 决策：需要模式允许、本地允许、服务端开启且无客户端连接
-      final noClients = _clients.isEmpty;
-      // 如果用户显式设置过（内存标志），优先使用用户设置；否则使用服务端配置。
-      final effectiveAllowHide = _isHideCmExplicit ? _isHideCmRequested : serverHideBool;
-      final shouldHide = canHideByMode && effectiveAllowHide && noClients;
-
-      // 仅在与上次生效状态不同的时候执行实际操作
-      if (shouldHide != _isCurrentlyHidden) {
-        _isCurrentlyHidden = shouldHide;
-        if (shouldHide) {
-          await hideCmWindow();
-        } else {
-          await showCmWindow();
-        }
-      }
-    } finally {
-      _isProcessingHide = false;
-    }
-  }
 
   int get connectStatus => _connectStatus;
 
@@ -157,6 +90,12 @@ class ServerModel with ChangeNotifier {
 
   setVerificationMethod(String method) async {
     await bind.mainSetOption(key: kOptionVerificationMethod, value: method);
+    /*
+    if (method != kUsePermanentPassword) {
+      await bind.mainSetOption(
+          key: 'allow-hide-cm', value: bool2option('allow-hide-cm', false));
+    }
+    */
   }
 
   String get temporaryPasswordLength {
@@ -173,6 +112,12 @@ class ServerModel with ChangeNotifier {
 
   setApproveMode(String mode) async {
     await bind.mainSetOption(key: kOptionApproveMode, value: mode);
+    /*
+    if (mode != 'password') {
+      await bind.mainSetOption(
+          key: 'allow-hide-cm', value: bool2option('allow-hide-cm', false));
+    }
+    */
   }
 
   bool get allowNumericOneTimePassword => _allowNumericOneTimePassword;
@@ -195,7 +140,18 @@ class ServerModel with ChangeNotifier {
     _emptyIdShow = translate("Generating ...");
     _serverId = IDTextEditingController(text: _emptyIdShow);
 
-
+    /*
+    // initital _hideCm at startup
+    final verificationMethod =
+        bind.mainGetOptionSync(key: kOptionVerificationMethod);
+    final approveMode = bind.mainGetOptionSync(key: kOptionApproveMode);
+    _hideCm = option2bool(
+        'allow-hide-cm', bind.mainGetOptionSync(key: 'allow-hide-cm'));
+    if (!(approveMode == 'password' &&
+        verificationMethod == kUsePermanentPassword)) {
+      _hideCm = false;
+    }
+    */
 
     timerCallback() async {
       final connectionStatus =
@@ -213,16 +169,14 @@ class ServerModel with ChangeNotifier {
           updateClientState(res);
         } else {
           if (_clients.isEmpty) {
-            // evaluate hide/show decision (applyHideDecision will consider local/server opts)
-            await applyHideDecision();
             if (_zeroClientLengthCounter++ == 12) {
               // 6 second
               windowManager.close();
             }
           } else {
             _zeroClientLengthCounter = 0;
-            await applyHideDecision();
           }
+          await model.applyHideDecision();
         }
       }
 
@@ -243,6 +197,59 @@ class ServerModel with ChangeNotifier {
     // Initial keyboard status is off on mobile
     if (isMobile) {
       bind.mainSetOption(key: kOptionEnableKeyboard, value: 'N');
+    }
+  }
+
+  // 在 startup 时由 main.dart 调用：用来把启动时计算出的初始偏好写入内存模型
+  void setHideCmFromInitial(bool value, {bool explicit = false}) {
+    _isHideCmRequested = value;
+    _isHideCmExplicit = explicit;
+    notifyListeners();
+  }
+
+  // 在 UI（设置页面）中，当用户显式更改偏好时调用：标记为显式并更新内存
+  void setHideCmFromUser(bool value) {
+    _isHideCmRequested = value;
+    _isHideCmExplicit = true;
+    notifyListeners();
+  }
+
+  /// 中央化决策函数：仅基于内存状态和服务端配置决定是否隐藏/显示 CM
+  /// 注意：此函数不会直接写持久化（持久化应由设置 UI 负责）
+  Future<void> applyHideDecision({bool isStartup = false}) async {
+    if (_isProcessingHide) return;
+    _isProcessingHide = true;
+    try {
+      // 如果本地显式设置则以本地为准，否则尝试读取服务端配置（容错）
+      bool serverHide = false;
+      try {
+        final String? serverRaw = await bind.cmGetConfig(name: 'hide_cm');
+        serverHide = serverRaw != null && serverRaw.isNotEmpty && serverRaw == 'true';
+      } catch (e) {
+        serverHide = false; // 服务端异常时默认 false
+      }
+
+      final bool effectiveAllowHide = _isHideCmExplicit ? _isHideCmRequested : serverHide;
+
+      // 只有在 password 审批且验证方法为永久密码时才允许隐藏（与 UI 条件一致）
+      final bool canHideByMode = (approveMode == 'password' && verificationMethod == kUsePermanentPassword);
+
+      // 示例额外条件：没有客户端连接时才可以隐藏
+      final bool noClients = _clients.isEmpty;
+      final bool shouldHide = true
+      if(!noClients){
+        shouldHide = canHideByMode && effectiveAllowHide
+      }
+      if (shouldHide != _isCurrentlyHidden) {
+        _isCurrentlyHidden = shouldHide;
+        if (shouldHide) {
+          await hideCmWindow(isStartup: isStartup);
+        } else {
+          await showCmWindow(isStartup: isStartup);
+        }
+      }
+    } finally {
+      _isProcessingHide = false;
     }
   }
 
@@ -288,6 +295,14 @@ class ServerModel with ChangeNotifier {
     final approveMode = await bind.mainGetOption(key: kOptionApproveMode);
     final numericOneTimePassword =
         await mainGetBoolOption(kOptionAllowNumericOneTimePassword);
+    /*
+    var hideCm = option2bool(
+        'allow-hide-cm', await bind.mainGetOption(key: 'allow-hide-cm'));
+    if (!(approveMode == 'password' &&
+        verificationMethod == kUsePermanentPassword)) {
+      hideCm = false;
+    }
+    */
     if (_approveMode != approveMode) {
       _approveMode = approveMode;
       update = true;
@@ -322,7 +337,6 @@ class ServerModel with ChangeNotifier {
       _allowNumericOneTimePassword = numericOneTimePassword;
       update = true;
     }
-
     if (update) {
       notifyListeners();
     }
@@ -572,11 +586,7 @@ class ServerModel with ChangeNotifier {
       }
     }
     if (desktopType == DesktopType.cm) {
-      if (_clients.isEmpty) {
-        hideCmWindow();
-      } else if (!hideCm) {
-        showCmWindow();
-      }
+      await model.applyHideDecision();
     }
     if (_clients.length != oldClientLenght) {
       notifyListeners();
@@ -763,8 +773,8 @@ class ServerModel with ChangeNotifier {
         parent.target?.dialogManager.dismissByTag(getLoginDialogTag(id));
         parent.target?.invokeMethod("cancel_notification", id);
       }
-      if (desktopType == DesktopType.cm && _clients.isEmpty) {
-        hideCmWindow();
+      if (desktopType == DesktopType.cm) {
+        await model.applyHideDecision();
       }
       if (isAndroid) androidUpdatekeepScreenOn();
       notifyListeners();
