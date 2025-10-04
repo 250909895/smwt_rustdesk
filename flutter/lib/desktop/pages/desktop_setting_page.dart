@@ -1352,32 +1352,42 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
     return tmpWrapper();
   }
 
-  //页面显示隐藏连接管理窗口选项
+  // 页面：‘隐藏连接管理窗口’ 选项
+  // - 仅在启用且使用永久密码审批时可交互
+  // - 切换时将本地选项持久化并立即重新评估窗口显示决策
   Widget hide_cm(bool enabled) {
     return ChangeNotifierProvider.value(
       value: gFFI.serverModel,
       child: Consumer<ServerModel>(builder: (context, model, child) {
         onHideCmChanged(bool? b) async {
-          if (b != null) {
-            bind.mainSetLocalOption( key: 'allow-hide-cm', value: bool2option('allow-hide-cm', b));
-          }
+          if (b == null) return;
+
+          // 将用户选择写入本地持久化（'Y'/'N'）
+          await mainSetLocalBoolOption('allow-hide-cm', b);
+
+          // 更新模型的请求状态并立刻重新评估是否需要隐藏/显示窗口
+          model.hideCm = b;
+          await gFFI.serverModel.applyHideDecision();
         }
 
+        // 只有在外层启用并且审批模式为密码且验证方法为永久密码时才允许交互
+        final canInteract = enabled && (model.approveMode == 'password' && model.verificationMethod == kUsePermanentPassword);
+
         return Tooltip(
-          message: translate('hide_cm_tip'), // 直接显示提示信息
+          message: translate('hide_cm_tip'),
           child: GestureDetector(
-            onTap: () => onHideCmChanged(!model.hideCm), // 直接允许点击
+            onTap: canInteract ? () => onHideCmChanged(!model.hideCm) : null,
             child: Row(
               children: [
                 Checkbox(
                   value: model.hideCm,
-                  onChanged: enabled ? onHideCmChanged : null, // 只受 enabled 参数控制
+                  onChanged: canInteract ? onHideCmChanged : null,
                 ).marginOnly(right: 5),
                 Expanded(
                   child: Text(
                     translate('Hide connection management window'),
                     style: TextStyle(
-                      color: disabledTextColor(context, enabled), // 只受 enabled 参数控制
+                      color: disabledTextColor(context, canInteract),
                     ),
                   ),
                 ),

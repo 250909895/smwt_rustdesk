@@ -32,7 +32,13 @@ class ServerModel with ChangeNotifier {
   bool _fileOk = false;
   bool _clipboardOk = false;
   bool _showElevation = false;
-  bool _hideCm = false;
+  // 是否请求隐藏 CM 窗口（来自用户偏好或本地选项）。表示“请求/偏好”，
+  // 并不等同于窗口实际是否已被隐藏。
+  bool _isHideCmRequested = false;
+  // 是否正在处理隐藏/显示决策（互斥标志），用于防止 applyHideDecision 被并发调用。
+  bool _isProcessingHide = false;
+  // 记录上一次实际应用到窗口的隐藏状态（最后生效的结果），用于避免重复执行相同动作。
+  bool _isCurrentlyHidden = false;
   int _connectStatus = 0; // Rendezvous Server status
   String _verificationMethod = "";
   String _temporaryPasswordLength = "";
@@ -64,19 +70,55 @@ class ServerModel with ChangeNotifier {
   bool get clipboardOk => _clipboardOk;
 
   bool get showElevation => _showElevation;
-  //CM窗口是否显示状态值
-  bool get hideCm => _hideCm;
+  
+  bool get hideCm => _isHideCmRequested;
   
   set hideCm(bool value) {
-    if (value == "" || value == null) {
-      value = false;
-    };  
-    if (_hideCm != value) {
-      _hideCm = value;
-      if (!(approveMode == 'password' && verificationMethod == kUsePermanentPassword)) {
-        _hideCm = false;
+    // 仅更新“隐藏请求”状态（来自用户/本地设置）。
+    // 真正是否隐藏由 `applyHideDecision()` 决定，避免在 setter 中重复执行策略判断。
+    if (_isHideCmRequested == value) return;
+    _isHideCmRequested = value;
+    notifyListeners();
+  }
+
+  // 计算并执行 CM 窗口的隐藏/显示决策：
+  // - 考虑 approveMode、verificationMethod、本地选项和服务端配置，以及当前客户端数量
+  // - 使用互斥标志防止重入
+  // - 仅在生效状态改变时调用 hideCmWindow()/showCmWindow()
+  Future<void> applyHideDecision() async {
+    if (_isProcessingHide) return; // 防重入
+    _isProcessingHide = true;
+    try {
+      final canHideByMode = (approveMode == 'password' && verificationMethod == kUsePermanentPassword);
+
+      // 读取本地选项（同步）
+      final localHideBool = mainGetLocalBoolOptionSync("allow-hide-cm");
+
+      // 读取服务端配置（异步）
+      String serverHide = '';
+      try {
+        serverHide = await bind.cmGetConfig(name: 'hide_cm');
+      } catch (e) {
+        serverHide = '';
       }
-      notifyListeners();
+      final serverHideBool = serverHide == 'true';
+
+      // 决策：需要模式允许、本地允许、服务端开启且无客户端连接
+      final noClients = _clients.isEmpty;
+      final effectiveAllowHide = localHideBool ?? serverHideBool;
+      final shouldHide = canHideByMode && effectiveAllowHide && noClients;
+
+      // 仅在与上次生效状态不同的时候执行实际操作
+      if (shouldHide != _isCurrentlyHidden) {
+        _isCurrentlyHidden = shouldHide;
+        if (shouldHide) {
+          await hideCmWindow();
+        } else {
+          await showCmWindow();
+        }
+      }
+    } finally {
+      _isProcessingHide = false;
     }
   }
 
@@ -154,14 +196,15 @@ class ServerModel with ChangeNotifier {
           updateClientState(res);
         } else {
           if (_clients.isEmpty) {
-            hideCmWindow();
+            // evaluate hide/show decision (applyHideDecision will consider local/server opts)
+            await applyHideDecision();
             if (_zeroClientLengthCounter++ == 12) {
               // 6 second
               windowManager.close();
             }
           } else {
             _zeroClientLengthCounter = 0;
-            if (!hideCm) showCmWindow();
+            await applyHideDecision();
           }
         }
       }
