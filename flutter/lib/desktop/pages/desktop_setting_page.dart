@@ -1366,7 +1366,6 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
             try {
               await bind.mainSetLocalOption(key: 'allow-hide-cm', value: b ? 'Y' : 'N');
             } catch (e) {
-              await bind.mainSetLocalOption(key: 'sallow-hide-cm', value: b ? 'sY' : 'sN');
               // 忽略持久化错误（UI 不应阻塞），但仍更新内存模型以保持 UI 响应
             }
             // 更新内存模型并让模型来决定是否显示/隐藏窗口
@@ -1380,11 +1379,11 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
         return Tooltip(
           message: translate('hide_cm_tip'),
           child: GestureDetector(
-            onTap: canInteract ? () => onHideCmChanged(!model.isHideCmRequested()) : null,
+            onTap: canInteract ? () => onHideCmChanged(!model.isCurrentlyHidden()) : null,
             child: Row(
               children: [
                 Checkbox(
-                  value: model.isHideCmRequested(),
+                  value: model.isCurrentlyHidden(),
                   onChanged: canInteract ? onHideCmChanged : null,
                 ).marginOnly(right: 5),
                 Expanded(

@@ -38,8 +38,8 @@ class ServerModel with ChangeNotifier {
   bool _isProcessingHide = false; // 防止 applyHideDecision 并发
   bool _isCurrentlyHidden = false; // 记录上次实际应用到窗口的状态
 
-  // 返回内存中记录的隐藏 CM 请求值
-  bool isHideCmRequested() => _isHideCmRequested;
+  // 返回内存中记录的实际应用到窗口的状态
+  bool isCurrentlyHidden() => _isCurrentlyHidden;
   int _connectStatus = 0; // Rendezvous Server status
   String _verificationMethod = "";
   String _temporaryPasswordLength = "";
