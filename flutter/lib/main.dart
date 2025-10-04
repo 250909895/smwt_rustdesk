@@ -293,9 +293,32 @@ void runConnectionManagerScreen() async {
     const DesktopServerPage(),
     MyTheme.currentThemeMode(),
   );
-  //获取服务端配置，决定是否隐藏主窗口
-  final hide = await bind.cmGetConfig(name: "hide_cm") == 'true';
-  if (hide) {
+  // 获取服务端配置以及本地配置
+  // 若获取异常或返回空值，则设置默认值为 false
+  bool serverHideBool = false;
+  try {
+    final String? serverRaw = await bind.cmGetConfig(name: "hide_cm");
+    serverHideBool = serverRaw != null && serverRaw.isNotEmpty && serverRaw == 'true';
+  } catch (e) {
+    serverHideBool = false;
+  }
+
+  bool localHideBool = false;
+  try {
+    final String? localRaw = await bind.mainGetLocalOption(key: "allow-hide-cm");
+    localHideBool = localRaw != null && localRaw.isNotEmpty && localRaw == 'Y';
+  } catch (e) {
+    localHideBool = false;
+  }
+
+  // 本地设置优先：如果本地有显式设置则采用本地值，否则采用服务端配置
+  final bool effectiveHide = localHideBool ?? serverHideBool;
+
+  // 把用户偏好写入内存模型（持久化只能在设置 UI 中完成）
+  gFFI.serverModel.setHideCmFromInitial(effectiveHide);
+
+  // Startup 时需要使用 isStartup 参数做特殊处理（窗口初始化）
+  if (effectiveHide) {
     await hideCmWindow(isStartup: true);
   } else {
     await showCmWindow(isStartup: true);

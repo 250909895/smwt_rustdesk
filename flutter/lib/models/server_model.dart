@@ -35,6 +35,9 @@ class ServerModel with ChangeNotifier {
   // 是否请求隐藏 CM 窗口（来自用户偏好或本地选项）。表示“请求/偏好”，
   // 并不等同于窗口实际是否已被隐藏。
   bool _isHideCmRequested = false;
+  // 本地是否由用户显式设置过（true 表示用户通过设置 UI 显式保存了值）。
+  // 仅在 main.dart 加载时读取持久化（local option）或在设置 UI 写入时设置该标志。
+  bool _isHideCmExplicit = false;
   // 是否正在处理隐藏/显示决策（互斥标志），用于防止 applyHideDecision 被并发调用。
   bool _isProcessingHide = false;
   // 记录上一次实际应用到窗口的隐藏状态（最后生效的结果），用于避免重复执行相同动作。
@@ -81,6 +84,21 @@ class ServerModel with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 在应用启动时由 `main.dart` 调用，用来初始化内存中的偏好状态。
+  /// 参数 [explicit] 表示这个值是否源自本地持久化（true）还是仅为服务端回退值（false）。
+  void setHideCmFromInitial(bool value, {bool explicit = false}) {
+    _isHideCmRequested = value;
+    _isHideCmExplicit = explicit;
+    notifyListeners();
+  }
+
+  /// 在设置 UI 中用户显式更改时调用：既更新内存偏好，也将显式标志设为 true。
+  void setHideCmFromUser(bool value) {
+    _isHideCmRequested = value;
+    _isHideCmExplicit = true;
+    notifyListeners();
+  }
+
   // 计算并执行 CM 窗口的隐藏/显示决策：
   // - 考虑 approveMode、verificationMethod、本地选项和服务端配置，以及当前客户端数量
   // - 使用互斥标志防止重入
@@ -91,10 +109,8 @@ class ServerModel with ChangeNotifier {
     try {
       final canHideByMode = (approveMode == 'password' && verificationMethod == kUsePermanentPassword);
 
-      // 读取本地选项（同步）
-      final localHideBool = mainGetLocalBoolOptionSync("allow-hide-cm");
-
-      // 读取服务端配置（异步）
+      // 读取服务端配置（异步）。本地持久化不在此处读取——
+      // 本地持久化只在 main.dart 启动加载时读取，写入只由设置 UI 完成。
       String serverHide = '';
       try {
         serverHide = await bind.cmGetConfig(name: 'hide_cm');
@@ -105,7 +121,8 @@ class ServerModel with ChangeNotifier {
 
       // 决策：需要模式允许、本地允许、服务端开启且无客户端连接
       final noClients = _clients.isEmpty;
-      final effectiveAllowHide = localHideBool ?? serverHideBool;
+      // 如果用户显式设置过（内存标志），优先使用用户设置；否则使用服务端配置。
+      final effectiveAllowHide = _isHideCmExplicit ? _isHideCmRequested : serverHideBool;
       final shouldHide = canHideByMode && effectiveAllowHide && noClients;
 
       // 仅在与上次生效状态不同的时候执行实际操作

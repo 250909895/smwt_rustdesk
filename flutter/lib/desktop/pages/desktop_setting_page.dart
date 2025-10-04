@@ -1363,10 +1363,10 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
           if (b == null) return;
 
           // 将用户选择写入本地持久化（'Y'/'N'）
-          await mainSetLocalBoolOption('allow-hide-cm', b);
+          await bind.mainSetLocalOption(key: 'allow-hide-cm', value: b ? 'Y' : 'N');
 
-          // 更新模型的请求状态并立刻重新评估是否需要隐藏/显示窗口
-          model.hideCm = b;
+          // 更新模型的请求状态（标记为用户显式设置）并立刻重新评估是否需要隐藏/显示窗口
+          model.setHideCmFromUser(b);
           await gFFI.serverModel.applyHideDecision();
         }
 
