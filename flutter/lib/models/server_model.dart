@@ -38,8 +38,8 @@ class ServerModel with ChangeNotifier {
   bool _isProcessingHide = false; // 防止 applyHideDecision 并发
   bool _isCurrentlyHidden = false; // 记录上次实际应用到窗口的状态
 
-  // 兼容性：提供只读访问器供 UI 读取当前请求值
-  bool get hideCm => _isHideCmRequested;
+  // 返回内存中记录的隐藏 CM 请求值
+  bool isHideCmRequested() => _isHideCmRequested;
   int _connectStatus = 0; // Rendezvous Server status
   String _verificationMethod = "";
   String _temporaryPasswordLength = "";
@@ -618,7 +618,7 @@ class ServerModel with ChangeNotifier {
         _clients.removeAt(index_disconnected);
         tabController.remove(index_disconnected);
       }
-      if (desktopType == DesktopType.cm && !hideCm) {
+      if (desktopType == DesktopType.cm && !isHideCmRequested()) {
         showCmWindow();
       }
       scrollToBottom();
@@ -638,12 +638,12 @@ class ServerModel with ChangeNotifier {
         onTap: () {},
         page: desktop.buildConnectionCard(client)));
     Future.delayed(Duration.zero, () async {
-      if (!hideCm) windowOnTop(null);
+      if (!isHideCmRequested()) windowOnTop(null);
     });
     // Only do the hidden task when on Desktop.
     if (client.authorized && isDesktop) {
       cmHiddenTimer = Timer(const Duration(seconds: 3), () {
-        if (!hideCm) windowManager.minimize();
+        if (!isHideCmRequested()) windowManager.minimize();
         cmHiddenTimer = null;
       });
     }
