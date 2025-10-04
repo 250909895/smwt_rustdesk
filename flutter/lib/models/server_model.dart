@@ -236,7 +236,7 @@ class ServerModel with ChangeNotifier {
 
       // 示例额外条件：没有客户端连接时才可以隐藏
       final bool noClients = _clients.isEmpty;
-      final bool shouldHide = true
+      final bool shouldHide = true;
       if(!noClients){
         shouldHide = canHideByMode && effectiveAllowHide
       }
