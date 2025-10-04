@@ -1361,20 +1361,12 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
       value: gFFI.serverModel,
       child: Consumer<ServerModel>(builder: (context, model, child) {
         // 交互的时候也响应点击事件
-        onHideCmChanged() async {
-            bool b = !model.isCurrentlyHidden();
-            await bind.mainSetLocalOption(key: 'Aallow-hide-cm', value: model.isCurrentlyHidden() ? 'AY' : 'AN');
+        onHideCmChanged(bool b) async {
             // 先持久化用户选择（由 UI 负责持久化）
-            try {
               await bind.mainSetLocalOption(key: 'allow-hide-cm', value: b ? 'Y' : 'N');
-            } catch (e) {
-              // 忽略持久化错误（UI 不应阻塞），但仍更新内存模型以保持 UI 响应
-            }
             // 更新内存模型并让模型来决定是否显示/隐藏窗口
             model.setHideCmFromUser(b);
-            await bind.mainSetLocalOption(key: 'Ballow-hide-cm', value: model.isCurrentlyHidden() ? 'BY' : 'BN');
             await model.applyHideDecision();
-            await bind.mainSetLocalOption(key: 'CAallow-hide-cm', value: model.isCurrentlyHidden() ? 'CY' : 'CN');
         }
 
         // 只有在外层启用并且审批模式为密码且验证方法为永久密码时才允许交互
@@ -1384,12 +1376,12 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
           message: translate('hide_cm_tip'),
           child: GestureDetector(
             //交互的时候也响应点击事件
-            onTap: canInteract ? () => onHideCmChanged() : null,
+            onTap: canInteract ? () => onHideCmChanged(!model.isCurrentlyHidden()) : null,
             child: Row(
               children: [
                 Checkbox(
                   value: model.isCurrentlyHidden(),
-                  onChanged: canInteract ? onHideCmChanged() : null,
+                  onChanged: canInteract ? onHideCmChanged(!model.isCurrentlyHidden()) : null,
                 ).marginOnly(right: 5),
                 Expanded(
                   child: Text(
