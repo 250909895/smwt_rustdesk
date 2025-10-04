@@ -1361,7 +1361,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
       value: gFFI.serverModel,
       child: Consumer<ServerModel>(builder: (context, model, child) {
         // 交互的时候也响应点击事件
-        onHideCmChanged() {
+        onHideCmChanged() async {
             bool b = !model.isCurrentlyHidden();
             await bind.mainSetLocalOption(key: 'Aallow-hide-cm', value: model.isCurrentlyHidden() ? 'AY' : 'AN');
             // 先持久化用户选择（由 UI 负责持久化）
@@ -1389,7 +1389,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
               children: [
                 Checkbox(
                   value: model.isCurrentlyHidden(),
-                  onChanged: canInteract ? onHideCmChanged : null,
+                  onChanged: canInteract ? onHideCmChanged() : null,
                 ).marginOnly(right: 5),
                 Expanded(
                   child: Text(
