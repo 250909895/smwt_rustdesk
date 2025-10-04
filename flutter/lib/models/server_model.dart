@@ -40,6 +40,8 @@ class ServerModel with ChangeNotifier {
 
   // 返回内存中记录的实际应用到窗口的状态
   bool isCurrentlyHidden() => _isCurrentlyHidden;
+  // 返回内存中记录的希望隐藏 CM 的值（可来自 local 或用户）
+  bool isHideCmRequested() => _isHideCmRequested;
 
   int _connectStatus = 0; // Rendezvous Server status
   String _verificationMethod = "";

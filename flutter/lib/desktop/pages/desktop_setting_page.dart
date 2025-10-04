@@ -1379,8 +1379,8 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
         return Tooltip(
           message: translate('hide_cm_tip'),
           child: GestureDetector(
-            //交互的时候也响应点击事件，点击时获取当前窗口状态，切换状态并更新
-            onTap: canInteract ? () => onHideCmChanged(!model.isCurrentlyHidden()) : null,
+            //交互的时候也响应点击事件，点击时获取内存中记录希望隐藏 CM 的值，切换状态并更新
+            onTap: canInteract ? () => onHideCmChanged(!model.isHideCmRequested()) : null,
             child: Row(
               children: [
                 Checkbox(
