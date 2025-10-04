@@ -1361,12 +1361,14 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
       value: gFFI.serverModel,
       child: Consumer<ServerModel>(builder: (context, model, child) {
         // 交互的时候也响应点击事件
-        onHideCmChanged(bool b) async {
+        onHideCmChanged(bool? b) async {
+          if (b != null) {
             // 先持久化用户选择（由 UI 负责持久化）
               await bind.mainSetLocalOption(key: 'allow-hide-cm', value: b ? 'Y' : 'N');
             // 更新内存模型并让模型来决定是否显示/隐藏窗口
             model.setHideCmFromUser(b);
             await model.applyHideDecision();
+          }
         }
 
         // 只有在外层启用并且审批模式为密码且验证方法为永久密码时才允许交互
