@@ -238,7 +238,7 @@ class ServerModel with ChangeNotifier {
       final bool noClients = _clients.isEmpty;
       final bool shouldHide = true;
       if(!noClients){
-        shouldHide = canHideByMode && effectiveAllowHide
+        shouldHide = canHideByMode && effectiveAllowHide;
       }
       if (shouldHide != _isCurrentlyHidden) {
         _isCurrentlyHidden = shouldHide;
