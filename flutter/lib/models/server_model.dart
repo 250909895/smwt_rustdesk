@@ -253,6 +253,7 @@ class ServerModel with ChangeNotifier {
     } finally {
       _isProcessingHide = false;
     }
+    notifyListeners();
   }
 
   /// 1. check android permission
